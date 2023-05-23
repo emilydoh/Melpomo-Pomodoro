@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Melpomo</title>
+
+        <script type="text/javascript" src= "{{ url_for('static', filename = 'indexpage.js') }}"></script>
+
+    </head>
+
+    <body>
+        <h1> Melpomo </h1>
+        
+        <container>
+            <button type="button" onclick="changeSessionLengthRestartTimer()"> pomodoro </button>
+            <button type="button" onclick="changeSessionLengthRestartTimer('short break')"> short break </button>
+            <button type="button" onclick="changeSessionLengthRestartTimer('long break')"> long break </button>
+            
+            <p id="time">25:00</p>
+
+            <button type="button" onclick="start()" id="startButton">start</button>
+            <button type="button" onclick="pause()"> pause </button>
+        
+        </container>
+    </body>
+</html>
