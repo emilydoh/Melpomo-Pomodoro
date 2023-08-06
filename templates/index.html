@@ -1,25 +1,149 @@
-<!DOCTYPE html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Melpomo</title>
+<!doctype html>
+<html lang ="en">
 
-        <script type="text/javascript" src= "{{ url_for('static', filename = 'indexpage.js') }}"></script>
+<head>
+    <!-- meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    </head>
+    <link rel="stylesheet" type="text/css" href="/static/main.css">
 
-    <body>
-        <h1> Melpomo </h1>
+    <title>melpomo</title>
+    <link src="/favicon.ico" rel="shortcut icon" type="image/x-icon">
+</head>
+
+<div class = "body">
+    <h1>melpomo</h1>
+
+    <!-- background rectangle -->
+    <div class ="container">
+        <!-- choosing the length of timer buttons -->
+        <div class = "toprow">
+            <button class = "topbutton button" onClick="setTime('25:00')">pomodoro</button>
+            <button class = "topbutton button" onClick="setTime('05:00')">short break</button>
+            <button class = "topbutton button" onClick="setTime('15:00')">long break</button>
+        </div>
         
-        <container>
-            <button type="button" onclick="changeSessionLengthRestartTimer()"> pomodoro </button>
-            <button type="button" onclick="changeSessionLengthRestartTimer('short break')"> short break </button>
-            <button type="button" onclick="changeSessionLengthRestartTimer('long break')"> long break </button>
-            
-            <p id="time">25:00</p>
-
-            <button type="button" onclick="start()" id="startButton">start</button>
-            <button type="button" onclick="pause()"> pause </button>
+        <div class = "resultbox">
+            <p id="result">25:00</p>
+        </div>
         
-        </container>
-    </body>
+        <div class = "bottomrow">
+            <button class = "bottombutton button" onclick="start()">start</button>
+            <button class = "bottombutton button" onclick="pause()" id = "pauseButton">pause</button>
+            <button class = "bottombutton button" onclick="resume()" id = "resumeButton" style="display:none">resume</button>
+        </div>
+        
+    </div>
+
+    <!-- audio element for beep once timer is done -->
+    <!--sound effect credit: https://www.zapsplat.com-->
+    <audio id="audio" autoplay>
+        <source src="/static/zapsplat_multimedia_alert_notification_positive_chime_mallet_success_finished_complete_81104.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- javascript for timer and buttons -->
+    <script>
+    //number of seconds remaining in timer
+    var timer  = 1500;
+    var result = document.getElementById("result");
+
+    var counter = 10;
+    var timerId = null;
+
+    var isPaused = false;
+    
+    //isRunning keeps track of if in an active session of timer (start button has been pressed and update function called)
+    //only reset to false when we change to a new pomodoro button, and the timer is reset
+    var isRunning = false;
+
+    function update() {
+        if (isPaused===true){
+            return;
+        }
+        isRunning=true;
+        // current time to display in terms of minutes and seconds remaining
+        var mins = Math.floor(counter / 60);
+        var secs = counter % 60;
+
+        // formatting the text
+        if(mins < 10) {
+            mins = "0" + mins;
+        }
+        if(secs < 10) {
+            secs = "0" + secs;
+        }
+        
+        var text = mins + ":" + secs;
+        
+        // replace in HTML
+        result.innerHTML = text;
+        
+        //decrementing the counter and runnning the function update again after 1 second / 1000 milliseconds
+        //update() stops calling itself when count = 0, or the isPaused condition beccomes true at beginning of function 
+        if (counter > 0) {
+            counter = counter - 1;
+            timer = counter;
+            timerId = window.setTimeout(update, 1000);
+        }
+        else {
+            isRunning = false;
+            playBeep();
+        }
+    }
+
+    function start() {
+        if (isRunning==false) {
+            counter = timer;
+            update();
+        }
+    }    
+
+    function pause() {
+        if (isRunning==true) {
+            document.getElementById("pauseButton").style.display = 'none';
+            document.getElementById("resumeButton").style.display = 'block';
+            isPaused = true;
+            isRunning = false;
+            //clearTimeout(timerId);
+        }
+    }
+
+    // this button/function will replace the pause function when pause is clicked
+    function resume() {
+        if (isRunning==false) {
+            document.getElementById("pauseButton").style.display = 'block';
+            document.getElementById("resumeButton").style.display = 'none';
+            isPaused = false;
+            start();
+        }
+    }
+
+    function setTime(time) {
+        //resets the isRunning condition to false so we can start the timer again
+        isRunning = false;
+        result.innerHTML = time;
+        var newTime = 1500;
+        if (time === '15:00') {
+            newTime = 900;
+        } 
+        else if (time === '05:00') {
+            newTime = 300;
+        } 
+        timer = newTime;
+        counter = newTime;
+        
+        //this does everything the resume function does in terms of resetting the page to the initial state but also starts the timer again
+        document.getElementById("pauseButton").style.display = 'block';
+        document.getElementById("resumeButton").style.display = 'none';
+        isPaused = false;
+    }
+
+    function playBeep() {
+        var beep = document.getElementById("audio");
+        beep.play();
+    }
+
+    </script>
+</div>
 </html>
